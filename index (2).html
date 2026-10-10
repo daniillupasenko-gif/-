@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>КВЕСТ: Ночь, шаурма и три идиота</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;background:#020a02;color:#39ff6a;font-family:"Courier New",monospace}
+.w{max-width:640px;margin:0 auto;padding:18px}
+h1{font-size:20px;border-bottom:2px solid #39ff6a;padding-bottom:8px;text-shadow:0 0 8px #39ff6a}
+#t{font-size:17px;line-height:1.55;min-height:150px;white-space:pre-wrap}
+.cur::after{content:"█";animation:b 1s steps(1) infinite}
+@keyframes b{50%{opacity:0}}
+button{display:block;width:100%;text-align:left;font:inherit;background:#041a08;color:#39ff6a;border:2px solid #39ff6a;padding:12px;margin:10px 0;cursor:pointer}
+button:active,button:hover{background:#39ff6a;color:#000}
+.end{color:#ffe600;font-size:22px;text-shadow:0 0 10px #ffe600;margin-bottom:8px}
+.s{opacity:.6;font-size:13px;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>&gt; КВЕСТ: НОЧЬ, ШАУРМА И ТРИ ИДИОТА_</h1>
+<div id="t"></div>
+<div id="c"></div>
+<div class="s" id="s"></div>
+</div>
+<script>
+var n="",found={},timer;
+var S={
+start:{t:"3:00 ночи. {n} просыпается от голода. В холодильнике одна лампочка и та перегорела. В кармане 47 рублей и фантик.\n\nНадо идти за шаурмой. Но с кем?",c:[["Позвать Чёрного","a"],["Позвать Шифера","b"],["Пойти одному, как герой","c"]]},
+a:{t:"Чёрный не ответил. Но когда {n} открывает дверь, из темноты на него смотрят два белых глаза. Это Чёрный. Он стоял там уже час. Просто так.",c:[["Закричать на весь подъезд","e1"],["Сделать вид, что так и задумано","d"]]},
+b:{t:"Шифер пришёл через два часа. Объяснил: «Я был на крыше». Все знают, что он оттуда не вылезает.",c:[["Поверить и идти дальше","d"],["Постучать по нему, проверить крепость","e2"]]},
+c:{t:"{n} идёт один. На углу сидит собака и смотрит как судья на экзамене. Она явно знает, где шаурма.",c:[["Поделиться фантиком","f"],["Убежать, ведь это явно оборотень","e3"]]},
+d:{t:"Втроём у ларька. Продавец, не поднимая глаз: «Шаурмы нет. Есть сочувствие и лаваш без начинки».",c:[["Взять сочувствие","e4"],["Потребовать жалобную книгу","e5"]]},
+f:{t:"Собака берёт фантик, кивает и ведёт {n} во дворы. Там тайный ларёк, а за прилавком стоит Шифер. Он давно тут работает. Все думали, что он на крыше.",c:[["Спросить «а как же крыша?»","e6"]]},
+e1:{e:"КОНЦОВКА: СОСЕДИ БЬЮТ ПО БАТАРЕЕ",t:"Весь дом проснулся. Баба Нина вызвала участкового, и участковый тоже голодный. Вы поели вместе. Шаурмы не было, но были пельмени из его сумки."},
+e2:{e:"КОНЦОВКА: ШИФЕР ТРЕСНУЛ",t:"Раздался хруст. Шифер раскололся на две волны, обе обиделись и разошлись по разным домам. Шаурму вы так и не съели, зато починили крышу бабе Нине."},
+e3:{e:"КОНЦОВКА: СПРИНТЕР",t:"{n} пробежал 4 километра и случайно выиграл забег «Мини-марафон». Приз: талон на шаурму. Но ларёк закрыт. Круг замкнулся."},
+e4:{e:"КОНЦОВКА: ФИЛОСОФЫ",t:"Вы сели на бордюр и ели сочувствие. Оно оказалось безвкусным, зато очень душевным. Чёрный сказал самую умную фразу в жизни, но никто не расслышал: он стоял в темноте."},
+e5:{e:"КОНЦОВКА: ЖАЛОБА ГОДА",t:"Вы писали жалобу до рассвета, получилась поэма на 12 страниц. Продавец прослезился и налил вам чай. Это лучший чай в вашей жизни, и шаурма уже не нужна."},
+e6:{e:"КОНЦОВКА: ИСТИННЫЙ ШИФЕР ✔ (СЕКРЕТНАЯ)",t:"Шифер вздыхает: «Крыша ехала, а я приехал к шаурме». Он делает вам три порции бесплатно. Собака получает четвёртую. Лучшая ночь в истории банды."}
+};
+function type(x,cb){clearInterval(timer);var el=document.getElementById("t"),i=0;el.className="cur";el.innerHTML="";timer=setInterval(function(){i+=2;el.textContent=x.slice(0,i);if(i>=x.length){clearInterval(timer);el.className="";el.textContent=x;cb()}},18)}
+function show(id){
+  var sc=S[id],c=document.getElementById("c");c.innerHTML="";
+  var txt=sc.t.replace(/\{n\}/g,n);
+  if(sc.e){found[id]=1;txt=sc.e+"\n\n"+txt}
+  type(txt,function(){
+    if(sc.c){sc.c.forEach(function(o){var b=document.createElement("button");b.textContent="> "+o[0];b.onclick=function(){show(o[1])};c.appendChild(b)})}
+    else{var b=document.createElement("button");b.textContent="> ИГРАТЬ ЗАНОВО";b.onclick=menu;c.appendChild(b)}
+    document.getElementById("s").textContent="Открыто концовок: "+Object.keys(found).length+" из 6"
+  })
+}
+function menu(){
+  clearInterval(timer);var c=document.getElementById("c");c.innerHTML="";
+  document.getElementById("t").textContent="Кем будешь играть?";
+  ["Волосатый","Чёрный","Шифер"].forEach(function(x){var b=document.createElement("button");b.textContent="> "+x;b.onclick=function(){n=x;show("start")};c.appendChild(b)})
+}
+menu();
+</script>
+</body>
+</html>
